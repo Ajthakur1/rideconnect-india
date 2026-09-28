@@ -1,17 +1,20 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useProfile } from "@/lib/auth";
+import { CustomerNav } from "@/components/CustomerNav";
 
-export const Route = createFileRoute("/profile")({
+export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
-      { title: "Profile — RideConnect" },
-      { name: "description", content: "Manage your RideConnect account details." },
-      { property: "og:title", content: "Profile — RideConnect" },
-      { property: "og:description", content: "Manage your RideConnect account details." },
+      { title: "My profile — RideConnect" },
+      { name: "description", content: "Manage your RideConnect name and mobile number." },
+      { property: "og:title", content: "My profile — RideConnect" },
+      { property: "og:description", content: "Manage your RideConnect name and mobile number." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -28,11 +31,9 @@ function ProfilePage() {
     setPhone(data?.profile?.phone ?? "");
   }, [data]);
 
-  if (isLoading) return <p className="p-6 text-muted-foreground">Loading…</p>;
-  if (!session) return <div className="p-6"><Link to="/auth" className="underline">Sign in</Link> to view your profile.</div>;
-
   async function save() {
-    const { error } = await supabase.from("users").update({ name, phone }).eq("id", session.user.id);
+    if (!name.trim()) { toast.error("Name is required"); return; }
+    const { error } = await supabase.from("users").update({ name: name.trim(), phone: phone.trim() }).eq("id", session.user.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Profile saved");
     refetch();
@@ -40,13 +41,17 @@ function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-6 pb-24">
-      <h1 className="text-2xl font-bold">Profile</h1>
-      <p className="text-sm text-muted-foreground">{session.user.email} · {data?.role}</p>
-      <div className="mt-4 grid gap-2">
-        <input className="rounded-md border bg-background px-3 py-2" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="rounded-md border bg-background px-3 py-2" placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <Button onClick={save}>Save</Button>
-      </div>
+      <h1 className="text-2xl font-bold">My profile</h1>
+      <div className="mt-3"><CustomerNav /></div>
+      {isLoading ? <p className="mt-4 text-muted-foreground">Loading…</p> : (
+        <div className="card-elevated mt-5 space-y-3 p-4">
+          <div><Label>Email</Label><Input value={session?.user.email ?? ""} disabled /></div>
+          <div><Label htmlFor="n">Full name</Label><Input id="n" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} /></div>
+          <div><Label htmlFor="p">Mobile number</Label><Input id="p" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={15} /></div>
+          <p className="text-xs text-muted-foreground">Account type: {data?.role}</p>
+          <Button className="w-full" onClick={save}>Save changes</Button>
+        </div>
+      )}
     </div>
   );
 }

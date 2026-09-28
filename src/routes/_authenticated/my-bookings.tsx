@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useSession } from "@/lib/auth";
+import { useProfile } from "@/lib/auth";
+import { CustomerNav, useCustomerGuard } from "@/components/CustomerNav";
 import { BOOKING_TYPE_LABEL, STATUS_LABEL, inr } from "@/lib/domain";
 
-export const Route = createFileRoute("/my-bookings")({
+export const Route = createFileRoute("/_authenticated/my-bookings")({
   head: () => ({
     meta: [
       { title: "My bookings — RideConnect" },
-      { name: "description", content: "Track your RideConnect ride bookings and their status." },
+      { name: "description", content: "Track your upcoming, completed and cancelled RideConnect rides." },
       { property: "og:title", content: "My bookings — RideConnect" },
-      { property: "og:description", content: "Track your RideConnect ride bookings and their status." },
+      { property: "og:description", content: "Track your upcoming, completed and cancelled RideConnect rides." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -18,8 +20,19 @@ export const Route = createFileRoute("/my-bookings")({
   component: MyBookings,
 });
 
+const TABS = [
+  { key: "all", label: "All" },
+  { key: "upcoming", label: "Upcoming" },
+  { key: "completed", label: "Completed" },
+  { key: "cancelled", label: "Cancelled" },
+] as const;
+const COMPLETED = ["trip_completed", "payment_completed"];
+const CANCELLED = ["cancelled", "seller_rejected"];
+
 function MyBookings() {
-  const { session, isLoading } = useSession() as any;
+  const { session, data, isLoading } = useProfile() as any;
+  const ok = useCustomerGuard(data?.role, isLoading);
+  const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("all");
   const q = useQuery({
     queryKey: ["my-bookings", session?.user.id],
     enabled: !!session,
@@ -28,26 +41,40 @@ function MyBookings() {
         .from("bookings")
         .select("*, vehicles(brand, model)")
         .eq("customer_id", session.user.id)
-        .order("created_at", { ascending: false });
+        .order("pickup_date", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
 
-  if (isLoading) return <p className="p-6 text-muted-foreground">Loading…</p>;
-  if (!session)
-    return (
-      <div className="p-6">
-        <Link to="/auth" className="underline">Sign in</Link> to see your bookings.
-      </div>
-    );
+  if (!ok) return null;
+  const list = (q.data ?? []).filter((b) =>
+    tab === "all" ? true
+      : tab === "completed" ? COMPLETED.includes(b.booking_status)
+      : tab === "cancelled" ? CANCELLED.includes(b.booking_status)
+      : !COMPLETED.includes(b.booking_status) && !CANCELLED.includes(b.booking_status),
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 pb-24">
-      <h1 className="text-2xl font-bold">My bookings</h1>
-      {q.data?.length === 0 && <p className="mt-4 text-muted-foreground">No bookings yet.</p>}
+      <h1 className="text-2xl font-bold">Hi{data?.profile?.name ? `, ${data.profile.name.split(" ")[0]}` : ""}</h1>
+      <div className="mt-3"><CustomerNav /></div>
+      <div className="mt-5 grid grid-cols-4 gap-1 rounded-xl bg-secondary p-1 text-sm">
+        {TABS.map((t) => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={`rounded-lg py-2 font-medium ${tab === t.key ? "bg-background shadow-sm" : "text-muted-foreground"}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {q.isLoading && <p className="mt-4 text-muted-foreground">Loading…</p>}
+      {!q.isLoading && list.length === 0 && (
+        <p className="mt-6 text-center text-muted-foreground">
+          No bookings here. <Link to="/search" className="underline">Find a ride</Link>
+        </p>
+      )}
       <div className="mt-4 space-y-3">
-        {q.data?.map((b) => (
+        {list.map((b) => (
           <div key={b.id} className="card-elevated p-4 text-sm">
             <div className="flex justify-between">
               <span className="font-semibold">{b.booking_number}</span>

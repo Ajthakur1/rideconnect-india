@@ -13,10 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BecomeASellerRouteImport } from './routes/become-a-seller'
-import { Route as MyBookingsRouteImport } from './routes/my-bookings'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SellerRouteImport } from './routes/seller'
+import { Route as AuthenticatedMyBookingsRouteImport } from './routes/_authenticated/my-bookings'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as VehicleVehicleIdRouteImport } from './routes/vehicle.$vehicleId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -39,16 +39,6 @@ const BecomeASellerRoute = BecomeASellerRouteImport.update({
   path: '/become-a-seller',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MyBookingsRoute = MyBookingsRouteImport.update({
-  id: '/my-bookings',
-  path: '/my-bookings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -57,6 +47,16 @@ const SearchRoute = SearchRouteImport.update({
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMyBookingsRoute = AuthenticatedMyBookingsRouteImport.update({
+  id: '/_authenticated/my-bookings',
+  path: '/my-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/_authenticated/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VehicleVehicleIdRoute = VehicleVehicleIdRouteImport.update({
@@ -70,10 +70,10 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-a-seller': typeof BecomeASellerRoute
-  '/my-bookings': typeof MyBookingsRoute
-  '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
   '/seller': typeof SellerRoute
+  '/my-bookings': typeof AuthenticatedMyBookingsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
 }
 export interface FileRoutesByTo {
@@ -81,10 +81,10 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-a-seller': typeof BecomeASellerRoute
-  '/my-bookings': typeof MyBookingsRoute
-  '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
   '/seller': typeof SellerRoute
+  '/my-bookings': typeof AuthenticatedMyBookingsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
 }
 export interface FileRoutesById {
@@ -93,10 +93,10 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-a-seller': typeof BecomeASellerRoute
-  '/my-bookings': typeof MyBookingsRoute
-  '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
   '/seller': typeof SellerRoute
+  '/_authenticated/my-bookings': typeof AuthenticatedMyBookingsRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
 }
 export interface FileRouteTypes {
@@ -106,10 +106,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-a-seller'
-    | '/my-bookings'
-    | '/profile'
     | '/search'
     | '/seller'
+    | '/my-bookings'
+    | '/profile'
     | '/vehicle/$vehicleId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,10 +117,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-a-seller'
-    | '/my-bookings'
-    | '/profile'
     | '/search'
     | '/seller'
+    | '/my-bookings'
+    | '/profile'
     | '/vehicle/$vehicleId'
   id:
     | '__root__'
@@ -128,10 +128,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-a-seller'
-    | '/my-bookings'
-    | '/profile'
     | '/search'
     | '/seller'
+    | '/_authenticated/my-bookings'
+    | '/_authenticated/profile'
     | '/vehicle/$vehicleId'
   fileRoutesById: FileRoutesById
 }
@@ -140,10 +140,10 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BecomeASellerRoute: typeof BecomeASellerRoute
-  MyBookingsRoute: typeof MyBookingsRoute
-  ProfileRoute: typeof ProfileRoute
   SearchRoute: typeof SearchRoute
   SellerRoute: typeof SellerRoute
+  AuthenticatedMyBookingsRoute: typeof AuthenticatedMyBookingsRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   VehicleVehicleIdRoute: typeof VehicleVehicleIdRoute
 }
 
@@ -177,20 +177,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BecomeASellerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/my-bookings': {
-      id: '/my-bookings'
-      path: '/my-bookings'
-      fullPath: '/my-bookings'
-      preLoaderRoute: typeof MyBookingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -203,6 +189,20 @@ declare module '@tanstack/react-router' {
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof SellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/my-bookings': {
+      id: '/_authenticated/my-bookings'
+      path: '/my-bookings'
+      fullPath: '/my-bookings'
+      preLoaderRoute: typeof AuthenticatedMyBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vehicle/$vehicleId': {
@@ -220,10 +220,10 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BecomeASellerRoute: BecomeASellerRoute,
-  MyBookingsRoute: MyBookingsRoute,
-  ProfileRoute: ProfileRoute,
   SearchRoute: SearchRoute,
   SellerRoute: SellerRoute,
+  AuthenticatedMyBookingsRoute: AuthenticatedMyBookingsRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   VehicleVehicleIdRoute: VehicleVehicleIdRoute,
 }
 export const routeTree = rootRouteImport
