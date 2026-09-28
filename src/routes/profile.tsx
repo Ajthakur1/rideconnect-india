@@ -33,7 +33,7 @@ function ProfilePage() {
 
   async function save() {
     const { error } = await supabase.from("users").update({ name, phone }).eq("id", session.user.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Profile saved");
     refetch();
   }

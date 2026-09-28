@@ -60,8 +60,8 @@ function AuthPage() {
           _name: name.trim(),
           _phone: phone.trim(),
           _role: role,
-          _business_name: business.trim() || undefined,
-          _city: city.trim() || undefined,
+          _business_name: business.trim(),
+          _city: city.trim(),
         });
         if (rpcError) throw rpcError;
         toast.success("Welcome to RideConnect!");

@@ -75,7 +75,7 @@ function VehiclePage() {
       navigate({ to: "/auth" });
       return;
     }
-    if (!pickup.trim()) return toast.error("Enter a pickup location.");
+    if (!pickup.trim()) { toast.error("Enter a pickup location."); return; }
     setBusy(true);
     try {
       const { data, error } = await supabase

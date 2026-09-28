@@ -149,10 +149,10 @@ function AddVehicle({ sellerId, city, onDone }: { sellerId: string; city: string
   });
   const set = (k: string, v: any) => setF((p) => ({ ...p, [k]: v }));
   async function submit() {
-    if (!f.registration_number.trim()) return toast.error("Registration number required");
+    if (!f.registration_number.trim()) { toast.error("Registration number required"); return; }
     const { image, ...rest } = f;
     const { error } = await supabase.from("vehicles").insert({ ...rest, seller_id: sellerId, images: image ? image.split(",").map((s) => s.trim()) : [] });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Vehicle submitted for admin approval");
     onDone();
   }
