@@ -58,10 +58,10 @@ function AuthPage() {
         if (error) throw error;
         const { error: rpcError } = await supabase.rpc("bootstrap_profile", {
           _name: name.trim(),
-          _phone: phone.trim() || null,
+          _phone: phone.trim(),
           _role: role,
-          _business_name: business.trim() || null,
-          _city: city.trim() || null,
+          _business_name: business.trim() || undefined,
+          _city: city.trim() || undefined,
         });
         if (rpcError) throw rpcError;
         toast.success("Welcome to RideConnect!");
