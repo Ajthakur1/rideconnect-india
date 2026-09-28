@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -21,6 +21,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Create a RideConnect account to book rides or list your vehicles." },
       { property: "og:title", content: "Sign in or register — RideConnect" },
       { property: "og:description", content: "Create a RideConnect account to book rides or list your vehicles." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,
@@ -54,6 +56,7 @@ function AuthPage() {
     try {
       if (mode === "register") {
         if (!name.trim()) throw new Error("Please enter your name.");
+        if (!/^[0-9+ ]{10,15}$/.test(phone.trim())) throw new Error("Please enter a valid mobile number.");
         const { error } = await supabase.auth.signUp({ email: email.trim(), password });
         if (error) throw error;
         const { error: rpcError } = await supabase.rpc("bootstrap_profile", {
@@ -111,8 +114,8 @@ function AuthPage() {
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
               </div>
               <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} />
+                <Label htmlFor="phone">Mobile number</Label>
+                <Input id="phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required pattern="[0-9+ ]{10,15}" maxLength={15} />
               </div>
               {role === "seller" && (
                 <>
@@ -147,6 +150,11 @@ function AuthPage() {
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
           </Button>
         </form>
+        {mode === "login" && (
+          <Link to="/forgot-password" className="mt-3 block text-center text-sm text-muted-foreground underline-offset-4 hover:underline">
+            Forgot password?
+          </Link>
+        )}
 
         <button
           type="button"
