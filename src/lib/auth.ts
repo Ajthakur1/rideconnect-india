@@ -44,11 +44,18 @@ export function useProfile() {
         .select("role")
         .eq("user_id", userId!);
 
-      const { data: seller } = await supabase
+      const { data: sellerRow } = await supabase
         .from("seller_profiles")
-        .select("*")
+        .select("id")
         .eq("user_id", userId!)
         .maybeSingle();
+      let seller: any = null;
+      if (sellerRow?.id) {
+        const { data: full } = await (supabase as any).rpc("get_seller_profile_private", {
+          _seller_id: sellerRow.id,
+        });
+        seller = Array.isArray(full) ? (full[0] ?? null) : full;
+      }
 
       const roleList = (roles ?? []).map((r) => r.role as Role);
       const role: Role = roleList.includes("admin")
