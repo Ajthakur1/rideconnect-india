@@ -640,6 +640,32 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_seller_profile_private: {
+        Args: { _seller_id: string }
+        Returns: {
+          address: string | null
+          business_name: string
+          city: string
+          commission_rate: number
+          created_at: string
+          email: string | null
+          id: string
+          is_demo: boolean
+          owner_name: string
+          phone: string | null
+          rating: number
+          status: string
+          updated_at: string
+          user_id: string
+          verification_status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "seller_profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -190,7 +190,7 @@ function Home() {
           {CATEGORIES.map((c) => (
             <button
               key={c.label}
-              onClick={() => search({ type: c.type, vt: "vt" in c ? (c.vt as string) : undefined })}
+              onClick={() => search("vt" in c ? { type: c.type, vt: c.vt as string } : { type: c.type })}
               className="card-elevated flex flex-col items-center gap-2 p-4 text-center transition-transform hover:-translate-y-0.5"
             >
               <span className="flex size-10 items-center justify-center rounded-xl bg-secondary">
