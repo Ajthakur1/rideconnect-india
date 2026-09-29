@@ -8,7 +8,7 @@ import { useProfile } from "@/lib/auth";
 import { acceptBookingRequest, rejectBookingRequest } from "@/lib/dispatch";
 import { CITIES, FUEL_TYPES, STATUS_LABEL, TRANSMISSIONS, VEHICLE_TYPES, inr } from "@/lib/domain";
 
-export const Route = createFileRoute("/seller")({
+export const Route = createFileRoute("/_authenticated/seller")({
   head: () => ({
     meta: [
       { title: "Seller dashboard — RideConnect" },
