@@ -17,9 +17,9 @@ import { Route as BecomeASellerRouteImport } from './routes/become-a-seller'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SearchRouteImport } from './routes/search'
-import { Route as SellerRouteImport } from './routes/seller'
 import { Route as AuthenticatedMyBookingsRouteImport } from './routes/_authenticated/my-bookings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
 import { Route as VehicleVehicleIdRouteImport } from './routes/vehicle.$vehicleId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -61,11 +61,6 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SellerRoute = SellerRouteImport.update({
-  id: '/seller',
-  path: '/seller',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedMyBookingsRoute = AuthenticatedMyBookingsRouteImport.update({
   id: '/my-bookings',
   path: '/my-bookings',
@@ -74,6 +69,11 @@ const AuthenticatedMyBookingsRoute = AuthenticatedMyBookingsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
+  id: '/seller',
+  path: '/seller',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const VehicleVehicleIdRoute = VehicleVehicleIdRouteImport.update({
@@ -90,9 +90,9 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
-  '/seller': typeof SellerRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/seller': typeof AuthenticatedSellerRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
 }
 export interface FileRoutesByTo {
@@ -103,9 +103,9 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
-  '/seller': typeof SellerRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/seller': typeof AuthenticatedSellerRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
 }
 export interface FileRoutesById {
@@ -118,9 +118,9 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
-  '/seller': typeof SellerRoute
   '/_authenticated/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/seller': typeof AuthenticatedSellerRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
 }
 export interface FileRouteTypes {
@@ -133,9 +133,9 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/search'
-    | '/seller'
     | '/my-bookings'
     | '/profile'
+    | '/seller'
     | '/vehicle/$vehicleId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -146,9 +146,9 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/search'
-    | '/seller'
     | '/my-bookings'
     | '/profile'
+    | '/seller'
     | '/vehicle/$vehicleId'
   id:
     | '__root__'
@@ -160,9 +160,9 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/search'
-    | '/seller'
     | '/_authenticated/my-bookings'
     | '/_authenticated/profile'
+    | '/_authenticated/seller'
     | '/vehicle/$vehicleId'
   fileRoutesById: FileRoutesById
 }
@@ -175,7 +175,6 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
-  SellerRoute: typeof SellerRoute
   VehicleVehicleIdRoute: typeof VehicleVehicleIdRoute
 }
 
@@ -237,13 +236,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/seller': {
-      id: '/seller'
-      path: '/seller'
-      fullPath: '/seller'
-      preLoaderRoute: typeof SellerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/my-bookings': {
       id: '/_authenticated/my-bookings'
       path: '/my-bookings'
@@ -256,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/seller': {
+      id: '/_authenticated/seller'
+      path: '/seller'
+      fullPath: '/seller'
+      preLoaderRoute: typeof AuthenticatedSellerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/vehicle/$vehicleId': {
@@ -271,11 +270,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyBookingsRoute: typeof AuthenticatedMyBookingsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSellerRoute: typeof AuthenticatedSellerRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyBookingsRoute: AuthenticatedMyBookingsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSellerRoute: AuthenticatedSellerRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -290,7 +291,6 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
-  SellerRoute: SellerRoute,
   VehicleVehicleIdRoute: VehicleVehicleIdRoute,
 }
 export const routeTree = rootRouteImport
