@@ -74,7 +74,7 @@ function SellerDashboard() {
       let names: Record<string, string> = {};
       if (ids.length) {
         const { data: u } = await supabase.from("users").select("id,name").in("id", ids as string[]);
-        names = Object.fromEntries((u ?? []).map((x) => [x.id, (x.name || "").replace(/^Demo:\s*/, "").split(" ")[0]]));
+        names = Object.fromEntries((u ?? []).map((x) => [x.id, (x.name || "").replace(/^Demo:\s*/, "").split(" ")[0] ?? ""]));
       }
       return rows.map((r: any) => ({ ...r, customerFirst: names[r.bookings?.customer_id] ?? "Customer" }));
     },
