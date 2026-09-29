@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -19,6 +19,12 @@ export const Route = createFileRoute("/_authenticated/seller")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  beforeLoad: async ({ context }) => {
+    const uid = (context as any).user?.id;
+    const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+    const roles = (data ?? []).map((r) => r.role);
+    if (!roles.includes("seller") && !roles.includes("admin")) throw redirect({ to: "/my-bookings" });
+  },
   component: SellerDashboard,
 });
 
@@ -73,6 +79,11 @@ function SellerDashboard() {
     <div className="mx-auto max-w-5xl px-4 py-6 pb-24">
       <h1 className="text-2xl font-bold">{seller.business_name}</h1>
       <p className="text-sm text-muted-foreground">Verification: {seller.verification_status} · Commission {Number(seller.commission_rate)}%</p>
+      {seller.verification_status === "pending" && (
+        <div className="mt-4 rounded-xl border border-accent bg-secondary p-4 text-sm font-medium">
+          Your seller account has been created and is awaiting verification.
+        </div>
+      )}
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Pending requests" value={requests.data?.length ?? 0} />
         <Stat label="Confirmed trips" value={done.length} />
