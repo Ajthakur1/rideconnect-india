@@ -45,7 +45,10 @@ function BecomeSeller() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = schema.safeParse(f);
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      return;
+    }
     const v = parsed.data;
     setBusy(true);
     try {
