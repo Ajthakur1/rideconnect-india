@@ -75,7 +75,7 @@ function MyBookings() {
       )}
       <div className="mt-4 space-y-3">
         {list.map((b) => (
-          <div key={b.id} className="card-elevated p-4 text-sm">
+          <Link key={b.id} to="/booking/$bookingId" params={{ bookingId: b.id }} className="card-elevated block p-4 text-sm">
             <div className="flex justify-between">
               <span className="font-semibold">{b.booking_number}</span>
               <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">{STATUS_LABEL[b.booking_status] ?? b.booking_status}</span>
@@ -83,7 +83,7 @@ function MyBookings() {
             <p className="mt-1">{b.vehicles?.brand} {b.vehicles?.model} · {BOOKING_TYPE_LABEL[b.booking_type]}</p>
             <p className="text-muted-foreground">{b.pickup_location}{b.drop_location ? ` → ${b.drop_location}` : ""} · {b.pickup_date} {b.pickup_time?.slice(0, 5)}</p>
             <p className="mt-1 font-semibold">{inr(b.final_fare)}</p>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
