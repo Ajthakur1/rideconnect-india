@@ -20,8 +20,9 @@ export async function dispatchBooking(bookingId: string, preferredSellerId: stri
   for (const row of alternates ?? []) sellerIds.add(row.seller_id as string);
 
   const rows = [...sellerIds].map((seller_id) => ({ booking_id: bookingId, seller_id }));
-  await supabase.from("booking_requests").insert(rows);
-  await supabase.from("bookings").update({ booking_status: "seller_notified" }).eq("id", bookingId);
+  // Booking stays "pending" until a seller accepts; requests are the seller-side notification.
+  const { error } = await supabase.from("booking_requests").insert(rows);
+  if (error) console.error("dispatch failed", error.message);
 }
 
 /** Seller accepts: booking is awarded to them and all other requests expire. */

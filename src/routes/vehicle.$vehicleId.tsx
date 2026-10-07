@@ -50,6 +50,7 @@ function VehiclePage() {
   const [passengers, setPassengers] = useState(s.passengers ?? 1);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [review, setReview] = useState(false);
 
   const q = useQuery({
     queryKey: ["vehicle", vehicleId],
@@ -70,12 +71,22 @@ function VehiclePage() {
   const fare = calculateFare(v, type, pickup, drop || pickup);
   const p = priceForType(v, type);
 
+  function startReview() {
+    if (!session) { navigate({ to: "/auth" }); return; }
+    if (!pickup.trim()) { toast.error("Enter a pickup location."); return; }
+    if (type !== "local" && type !== "rental" && !drop.trim()) { toast.error("Enter a drop location."); return; }
+    if (!date || date < new Date().toISOString().slice(0, 10)) { toast.error("Choose today or a future date."); return; }
+    if (!time) { toast.error("Choose a pickup time."); return; }
+    if (passengers < 1 || passengers > v!.seats) { toast.error(`Passengers must be between 1 and ${v!.seats}.`); return; }
+    if (notes.length > 500) { toast.error("Notes must be under 500 characters."); return; }
+    setReview(true);
+  }
+
   async function book() {
     if (!session) {
       navigate({ to: "/auth" });
       return;
     }
-    if (!pickup.trim()) { toast.error("Enter a pickup location."); return; }
     setBusy(true);
     try {
       const { data, error } = await supabase
@@ -98,8 +109,8 @@ function VehiclePage() {
         .single();
       if (error) throw error;
       await dispatchBooking(data.id, v!.seller_id, v!.vehicle_type, v!.city);
-      toast.success(`Booking ${data.booking_number} created. Waiting for seller confirmation.`);
-      navigate({ to: "/my-bookings" });
+      toast.success(`Booking ${data.booking_number} created.`);
+      navigate({ to: "/booking/$bookingId", params: { bookingId: data.id } });
     } catch (e: any) {
       toast.error(e.message ?? "Could not create booking");
     } finally {
@@ -164,9 +175,24 @@ function VehiclePage() {
           <ul className="mt-3 list-disc pl-5 text-xs text-muted-foreground">
             {CANCELLATION_POLICY.map((c) => <li key={c}>{c}</li>)}
           </ul>
-          <Button variant="hero" size="xl" className="mt-4 w-full" disabled={busy} onClick={book}>
-            {session ? (busy ? "Booking…" : "Confirm booking") : "Sign in to book"}
-          </Button>
+          {!review ? (
+            <Button variant="hero" size="xl" className="mt-4 w-full" onClick={startReview}>
+              {session ? "Review booking" : "Sign in to book"}
+            </Button>
+          ) : (
+            <div className="mt-4 rounded-xl border border-accent bg-secondary p-3 text-sm">
+              <p className="font-semibold">Review your booking</p>
+              <p className="mt-1">{v.brand} {v.model} · {v.seller_profiles?.business_name}</p>
+              <p>{BOOKING_TYPE_LABEL[type]} · {pickup}{drop ? ` → ${drop}` : ""}</p>
+              <p>{date} at {time} · {passengers} passenger{passengers === 1 ? "" : "s"}</p>
+              {notes && <p className="text-muted-foreground">Notes: {notes}</p>}
+              <p className="mt-1 font-bold">Estimated total {inr(fare.total)}</p>
+              <div className="mt-3 flex gap-2">
+                <Button variant="outline" className="flex-1" disabled={busy} onClick={() => setReview(false)}>Edit</Button>
+                <Button variant="hero" className="flex-1" disabled={busy} onClick={book}>{busy ? "Booking…" : "Confirm booking"}</Button>
+              </div>
+            </div>
+          )}
           {profile && profile.role !== "customer" && <p className="mt-2 text-xs text-muted-foreground">Bookings are made from a customer account.</p>}
         </div>
       </div>

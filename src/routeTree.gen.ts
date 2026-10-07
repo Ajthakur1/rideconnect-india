@@ -21,6 +21,7 @@ import { Route as AuthenticatedMyBookingsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
 import { Route as VehicleVehicleIdRouteImport } from './routes/vehicle.$vehicleId'
+import { Route as AuthenticatedBookingBookingIdRouteImport } from './routes/_authenticated/booking.$bookingId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -81,6 +82,12 @@ const VehicleVehicleIdRoute = VehicleVehicleIdRouteImport.update({
   path: '/vehicle/$vehicleId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedBookingBookingIdRoute =
+  AuthenticatedBookingBookingIdRouteImport.update({
+    id: '/booking/$bookingId',
+    path: '/booking/$bookingId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/seller': typeof AuthenticatedSellerRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
+  '/booking/$bookingId': typeof AuthenticatedBookingBookingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/seller': typeof AuthenticatedSellerRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
+  '/booking/$bookingId': typeof AuthenticatedBookingBookingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -122,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRoute
   '/vehicle/$vehicleId': typeof VehicleVehicleIdRoute
+  '/_authenticated/booking/$bookingId': typeof AuthenticatedBookingBookingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/seller'
     | '/vehicle/$vehicleId'
+    | '/booking/$bookingId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/seller'
     | '/vehicle/$vehicleId'
+    | '/booking/$bookingId'
   id:
     | '__root__'
     | '/'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/seller'
     | '/vehicle/$vehicleId'
+    | '/_authenticated/booking/$bookingId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -264,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VehicleVehicleIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/booking/$bookingId': {
+      id: '/_authenticated/booking/$bookingId'
+      path: '/booking/$bookingId'
+      fullPath: '/booking/$bookingId'
+      preLoaderRoute: typeof AuthenticatedBookingBookingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -271,12 +291,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyBookingsRoute: typeof AuthenticatedMyBookingsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSellerRoute: typeof AuthenticatedSellerRoute
+  AuthenticatedBookingBookingIdRoute: typeof AuthenticatedBookingBookingIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyBookingsRoute: AuthenticatedMyBookingsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSellerRoute: AuthenticatedSellerRoute,
+  AuthenticatedBookingBookingIdRoute: AuthenticatedBookingBookingIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
