@@ -791,6 +791,8 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_booking_customer: { Args: { _booking_id: string }; Returns: boolean }
+      is_requested_seller: { Args: { _booking_id: string }; Returns: boolean }
       my_seller_id: { Args: never; Returns: string }
     }
     Enums: {
