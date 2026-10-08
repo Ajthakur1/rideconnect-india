@@ -1,86 +1,23 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Booking dispatch: notify the preferred seller plus other eligible verified
- * sellers offering the same vehicle type in the same city. First acceptance wins.
- * Notifications are dashboard-based in v1; the request rows are the transport-agnostic
- * queue that SMS/WhatsApp/email senders can later read from.
+ * Booking dispatch: the selected seller gets a booking request. If they reject,
+ * the database offers it to the next eligible verified seller (same type/city).
+ * Request rows are the transport-agnostic queue that SMS/WhatsApp/email senders can read later.
  */
-export async function dispatchBooking(bookingId: string, preferredSellerId: string, vehicleType: string, city: string) {
-  const { data: alternates } = await supabase
-    .from("vehicles")
-    .select("seller_id, seller_profiles!inner(id,verification_status,status)")
-    .eq("vehicle_type", vehicleType)
-    .eq("city", city)
-    .eq("status", "active")
-    .eq("seller_profiles.verification_status", "verified")
-    .eq("seller_profiles.status", "active");
-
-  const sellerIds = new Set<string>([preferredSellerId]);
-  for (const row of alternates ?? []) sellerIds.add(row.seller_id as string);
-
-  const rows = [...sellerIds].map((seller_id) => ({ booking_id: bookingId, seller_id }));
-  // Booking stays "pending" until a seller accepts; requests are the seller-side notification.
-  const { error } = await supabase.from("booking_requests").insert(rows);
+export async function dispatchBooking(bookingId: string, sellerId: string, _vehicleType?: string, _city?: string) {
+  const { error } = await supabase.from("booking_requests").insert({ booking_id: bookingId, seller_id: sellerId });
   if (error) console.error("dispatch failed", error.message);
 }
 
-/** Seller accepts: booking is awarded to them and all other requests expire. */
-export async function acceptBookingRequest(requestId: string, bookingId: string, sellerId: string) {
-  const { data: booking } = await supabase
-    .from("bookings")
-    .select("booking_status")
-    .eq("id", bookingId)
-    .maybeSingle();
-
-  if (booking && ["confirmed", "driver_assigned", "trip_started", "trip_completed", "payment_completed"].includes(booking.booking_status)) {
-    throw new Error("This booking has already been taken by another operator.");
-  }
-
-  const { error } = await supabase
-    .from("booking_requests")
-    .update({ response_status: "accepted", responded_at: new Date().toISOString() })
-    .eq("id", requestId);
+/** Only the assigned seller can respond; enforced in the database. */
+export async function acceptBookingRequest(requestId: string, _bookingId?: string, _sellerId?: string) {
+  const { error } = await (supabase as any).rpc("respond_booking_request", { _request_id: requestId, _accept: true });
   if (error) throw error;
-
-  const { data: seller } = await supabase
-    .from("seller_profiles")
-    .select("commission_rate")
-    .eq("id", sellerId)
-    .maybeSingle();
-
-  const { error: bErr } = await supabase
-    .from("bookings")
-    .update({
-      seller_id: sellerId,
-      booking_status: "confirmed",
-      commission_rate: seller?.commission_rate ?? 10,
-    })
-    .eq("id", bookingId);
-  if (bErr) throw bErr;
-
-  await supabase
-    .from("booking_requests")
-    .update({ response_status: "expired", responded_at: new Date().toISOString() })
-    .eq("booking_id", bookingId)
-    .neq("id", requestId)
-    .eq("response_status", "pending");
 }
 
-export async function rejectBookingRequest(requestId: string, bookingId: string) {
-  const { error } = await supabase
-    .from("booking_requests")
-    .update({ response_status: "rejected", responded_at: new Date().toISOString() })
-    .eq("id", requestId);
+export async function rejectBookingRequest(requestId: string, _bookingId?: string) {
+  const { data, error } = await (supabase as any).rpc("respond_booking_request", { _request_id: requestId, _accept: false });
   if (error) throw error;
-
-  const { count } = await supabase
-    .from("booking_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("booking_id", bookingId)
-    .eq("response_status", "pending");
-
-  if (!count) {
-    await supabase.from("bookings").update({ booking_status: "seller_rejected" }).eq("id", bookingId);
-  }
+  return data as string;
 }

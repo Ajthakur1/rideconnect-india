@@ -794,6 +794,10 @@ export type Database = {
       is_booking_customer: { Args: { _booking_id: string }; Returns: boolean }
       is_requested_seller: { Args: { _booking_id: string }; Returns: boolean }
       my_seller_id: { Args: never; Returns: string }
+      respond_booking_request: {
+        Args: { _accept: boolean; _request_id: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "customer" | "seller" | "admin"
