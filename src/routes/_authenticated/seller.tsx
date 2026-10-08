@@ -201,19 +201,28 @@ function SellerDashboard() {
               const b = r.bookings;
               return (
                 <div key={r.id} className="card-elevated p-4 text-sm">
-                  <p className="font-semibold">{b?.booking_number} · {b?.vehicles?.brand} {b?.vehicles?.model}</p>
-                  <p>Customer: {r.customerFirst} · {BOOKING_TYPE_LABEL[b?.booking_type] ?? b?.booking_type}</p>
-                  <p className="text-muted-foreground">{b?.pickup_location}{b?.drop_location ? ` → ${b.drop_location}` : ""} · {b?.pickup_date} {b?.pickup_time?.slice(0, 5)} · {b?.passengers} passengers</p>
-                  <p className="mt-1">Fare {inr(b?.final_fare)} · Commission {inr(b?.commission_amount)} · <b>You earn {inr(b?.seller_amount)}</b></p>
+                  <p className="font-semibold">{b?.booking_number} · {BOOKING_TYPE_LABEL[b?.booking_type] ?? b?.booking_type}</p>
+                  <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+                    <dt className="text-muted-foreground">Customer</dt><dd>{r.customerFirst}</dd>
+                    <dt className="text-muted-foreground">Pickup</dt><dd>{b?.pickup_location}</dd>
+                    <dt className="text-muted-foreground">Drop</dt><dd>{b?.drop_location || "—"}</dd>
+                    <dt className="text-muted-foreground">Date</dt><dd>{b?.pickup_date}</dd>
+                    <dt className="text-muted-foreground">Time</dt><dd>{b?.pickup_time?.slice(0, 5)}</dd>
+                    <dt className="text-muted-foreground">Passengers</dt><dd>{b?.passengers}</dd>
+                    <dt className="text-muted-foreground">Vehicle</dt><dd>{b?.vehicles?.brand} {b?.vehicles?.model}</dd>
+                    <dt className="text-muted-foreground">Estimated fare</dt><dd>{inr(b?.estimated_fare)}</dd>
+                    <dt className="text-muted-foreground">Platform commission</dt><dd>{inr(b?.commission_amount)}</dd>
+                    <dt className="text-muted-foreground">Your amount</dt><dd className="font-bold">{inr(b?.seller_amount)}</dd>
+                  </dl>
                   <div className="mt-3 flex gap-2">
                     <Button variant="success" className="flex-1" onClick={async () => {
-                      try { await acceptBookingRequest(r.id, r.booking_id, sid); toast.success("Booking confirmed"); refresh(); }
+                      try { await acceptBookingRequest(r.id); toast.success("Booking confirmed"); refresh(); }
                       catch (e: any) { toast.error(e.message); }
-                    }}>Accept</Button>
+                    }}>ACCEPT BOOKING</Button>
                     <Button variant="outline" className="flex-1" onClick={async () => {
-                      try { await rejectBookingRequest(r.id, r.booking_id); toast("Request rejected"); refresh(); }
+                      try { await rejectBookingRequest(r.id); toast("Request rejected"); refresh(); }
                       catch (e: any) { toast.error(e.message); }
-                    }}>Reject</Button>
+                    }}>REJECT BOOKING</Button>
                   </div>
                 </div>
               );
