@@ -11,12 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BecomeASellerRouteImport } from './routes/become-a-seller'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMyBookingsRouteImport } from './routes/_authenticated/my-bookings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
@@ -30,11 +30,6 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -61,6 +56,11 @@ const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMyBookingsRoute = AuthenticatedMyBookingsRouteImport.update({
   id: '/my-bookings',
@@ -91,12 +91,12 @@ const AuthenticatedBookingBookingIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-a-seller': typeof BecomeASellerRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/seller': typeof AuthenticatedSellerRoute
@@ -105,12 +105,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-a-seller': typeof BecomeASellerRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/seller': typeof AuthenticatedSellerRoute
@@ -121,12 +121,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-a-seller': typeof BecomeASellerRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRoute
@@ -137,12 +137,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/auth'
     | '/become-a-seller'
     | '/forgot-password'
     | '/reset-password'
     | '/search'
+    | '/admin'
     | '/my-bookings'
     | '/profile'
     | '/seller'
@@ -151,12 +151,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/auth'
     | '/become-a-seller'
     | '/forgot-password'
     | '/reset-password'
     | '/search'
+    | '/admin'
     | '/my-bookings'
     | '/profile'
     | '/seller'
@@ -166,12 +166,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/admin'
     | '/auth'
     | '/become-a-seller'
     | '/forgot-password'
     | '/reset-password'
     | '/search'
+    | '/_authenticated/admin'
     | '/_authenticated/my-bookings'
     | '/_authenticated/profile'
     | '/_authenticated/seller'
@@ -182,7 +182,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BecomeASellerRoute: typeof BecomeASellerRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -205,13 +204,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -248,6 +240,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/my-bookings': {
       id: '/_authenticated/my-bookings'
@@ -288,6 +287,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedMyBookingsRoute: typeof AuthenticatedMyBookingsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSellerRoute: typeof AuthenticatedSellerRoute
@@ -295,6 +295,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedMyBookingsRoute: AuthenticatedMyBookingsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSellerRoute: AuthenticatedSellerRoute,
@@ -307,7 +308,6 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BecomeASellerRoute: BecomeASellerRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
