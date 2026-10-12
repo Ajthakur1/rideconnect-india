@@ -747,6 +747,32 @@ export type Database = {
       }
     }
     Functions: {
+      admin_list_sellers: {
+        Args: never
+        Returns: {
+          address: string | null
+          business_name: string
+          city: string
+          commission_rate: number
+          created_at: string
+          email: string | null
+          id: string
+          is_demo: boolean
+          owner_name: string
+          phone: string | null
+          rating: number
+          status: string
+          updated_at: string
+          user_id: string
+          verification_status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "seller_profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       bootstrap_profile: {
         Args: {
           _business_name?: string
