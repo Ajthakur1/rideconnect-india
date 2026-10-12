@@ -40,7 +40,7 @@ function AdminDashboard() {
       const [users, roles, sellers, vehicles, bookings, payments, commissions, reviews, settings] = await Promise.all([
         supabase.from("users").select("id,name,phone,email,status,created_at,is_demo"),
         supabase.from("user_roles").select("user_id,role"),
-        supabase.from("seller_profiles").select("*"),
+        (supabase as any).rpc("admin_list_sellers") as Promise<{ data: any[] | null }>,
         supabase.from("vehicles").select("*"),
         supabase.from("bookings").select("*").order("created_at", { ascending: false }),
         supabase.from("payments").select("*").order("created_at", { ascending: false }),
