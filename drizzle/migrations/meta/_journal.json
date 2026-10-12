@@ -22,6 +22,13 @@
       "when": 1791785845863,
       "tag": "0002_admin_list_sellers",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791785955151,
+      "tag": "0003_vehicle_approval_guard",
+      "breakpoints": true
     }
   ]
 }
