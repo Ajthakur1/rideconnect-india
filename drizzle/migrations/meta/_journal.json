@@ -29,6 +29,13 @@
       "when": 1791785955151,
       "tag": "0003_vehicle_approval_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791910626218,
+      "tag": "0004_booking_availability_guard",
+      "breakpoints": true
     }
   ]
 }
