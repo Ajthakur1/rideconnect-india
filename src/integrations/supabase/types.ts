@@ -372,6 +372,7 @@ export type Database = {
           booking_id: string | null
           created_at: string
           customer_id: string
+          customer_name: string | null
           id: string
           is_demo: boolean
           rating: number
@@ -383,6 +384,7 @@ export type Database = {
           booking_id?: string | null
           created_at?: string
           customer_id: string
+          customer_name?: string | null
           id?: string
           is_demo?: boolean
           rating?: number
@@ -394,6 +396,7 @@ export type Database = {
           booking_id?: string | null
           created_at?: string
           customer_id?: string
+          customer_name?: string | null
           id?: string
           is_demo?: boolean
           rating?: number
