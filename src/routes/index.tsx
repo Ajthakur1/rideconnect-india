@@ -32,6 +32,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Compare trusted local taxis, rental cars and travel vehicles from verified local operators.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -74,7 +76,7 @@ function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from("reviews")
-        .select("id, rating, review_text, seller_profiles(business_name)")
+        .select("id, rating, review_text, customer_name")
         .order("created_at", { ascending: false })
         .limit(3);
       return data ?? [];
@@ -309,6 +311,7 @@ function Home() {
                 ))}
               </div>
               <p className="mt-3 text-sm">{r.review_text}</p>
+              {r.customer_name && <p className="mt-3 text-sm font-semibold">{r.customer_name}</p>}
             </div>
           ))}
         </div>
